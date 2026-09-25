@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: multi-provider-food-agent
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: ${OLLAMA_MODEL:qwen3:8b}
+          temperature: ${OLLAMA_TEMPERATURE:0.1}
+          num-ctx: ${OLLAMA_CONTEXT_WINDOW:8192}
+
+food-agent:
+  model:
+    provider: ${MODEL_PROVIDER:ollama}
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:qwen3:8b}
+    timeout: ${MODEL_TIMEOUT:60s}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+server:
+  shutdown: graceful
