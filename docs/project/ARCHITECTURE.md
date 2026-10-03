@@ -6,6 +6,22 @@ The system is a modular monolith with explicit ports around volatile dependencie
 
 The LLM interprets language and proposes structured actions. It does not calculate totals, normalize provider payloads, decide whether confirmation exists, or directly own credentials.
 
+The backend uses Maven modules to enforce the main dependency boundaries:
+
+```text
+food-agent-boot
+├── food-agent-api
+└── food-agent-infrastructure
+            |
+            v
+ food-agent-application
+            |
+            v
+   food-agent-domain
+```
+
+Provider-specific modules may be extracted later if the two adapters develop independent dependency or release needs. They remain within `food-agent-infrastructure` until that complexity exists.
+
 ## 2. System context
 
 ```text
@@ -184,14 +200,12 @@ Any cart mutation or expired/changed quote invalidates the prior confirmation. A
 
 ## 9. Technology decision gates
 
-The source discussion deliberately did not select all implementation technologies. Before scaffolding, record lightweight decisions for:
+Record lightweight decisions before introducing or changing implementation technologies. The M1 baseline is documented in `docs/decisions/0001-m1-technology-baseline.md`: Java 21, Spring Boot, Maven, Spring AI behind a project-owned gateway, and Ollama with configurable `qwen3:8b`. Remaining decision areas are:
 
-1. backend language/framework;
-2. local LLM runtime/model and structured-tool support;
-3. MCP client library/transport and provider auth flows;
-4. frontend build/test stack around React;
-5. session persistence;
-6. local development and packaging approach.
+1. MCP client library/transport and provider auth flows;
+2. frontend component/test stack around React and TypeScript;
+3. session persistence;
+4. packaging and deployment approach.
 
 Choose the smallest stack that supports streaming, schema validation, MCP connectivity, testability, and clear local setup.
 

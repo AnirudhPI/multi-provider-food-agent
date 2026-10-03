@@ -8,7 +8,7 @@
 - End each milestone with automated validation, a short manual demo, documented limitations, and a review checkpoint.
 - No implementation begins until the planning baseline is reviewed and approved.
 
-## M0 — Specification and architecture baseline (current)
+## M0 — Specification and architecture baseline (complete)
 
 **Outcome:** the repository contains an agreed source of truth and a staging branch.
 
@@ -20,7 +20,7 @@
 
 **Exit criteria:** documents are approved; no product implementation has been added; technology decisions required for M1 are recorded.
 
-## M1 — Local model foundation
+## M1 — Local model foundation (current)
 
 **Outcome:** the backend can send a constrained request to a selected local model and validate structured output.
 

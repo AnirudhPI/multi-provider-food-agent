@@ -2,9 +2,9 @@
 
 ## Current phase
 
-This repository is in **M0: specification and architecture review**.
+This repository is in **M1: local model foundation**.
 
-- Do not add product implementation, scaffolding, dependencies, generated projects, containers, CI workflows, or deployment configuration until the user explicitly approves the planning baseline and asks to begin a milestone.
+- Limit implementation to the active milestone. Do not add provider integrations, frontend scaffolding, containers, CI workflows, persistence, or deployment configuration during M1.
 - The four documents in `docs/project/`—`SPEC.md`, `ARCHITECTURE.md`, `PLAN.md`, and this file—are the current source of truth.
 - The planning baseline is committed on `development`. For subsequent work, create a short-lived feature branch from `development` and open a pull request back to `development` for user review.
 - Do not push feature commits directly to `development` or `main`, and do not merge pull requests, unless the user explicitly instructs you to do so.

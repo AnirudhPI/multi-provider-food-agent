@@ -144,8 +144,8 @@ The application has its own web UI and backend. It must not depend on the ChatGP
 
 ## 9. Open decisions requiring review
 
-- Backend language and framework.
-- Local LLM runtime and initial model, including minimum hardware expectations.
+- Backend language and framework are resolved for M1: Java 21, Spring Boot, and Maven.
+- Local LLM baseline is resolved for M1: Ollama with configurable `qwen3:8b`, initially targeting an Apple M3 Pro with 18 GB unified memory.
 - Exact Swiggy and Zomato MCP tools available to the project and their authentication flows.
 - Whether the first release executes real order placement or stops at a provider-hosted checkout handoff.
 - Session storage approach and whether any durable history is in scope.
