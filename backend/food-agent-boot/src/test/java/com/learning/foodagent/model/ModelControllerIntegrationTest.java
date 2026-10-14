@@ -29,6 +29,13 @@ class ModelControllerIntegrationTest {
 	}
 
 	@Test
+	void contributesModelHealthToActuator() throws Exception {
+		mockMvc.perform(get("/actuator/health"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").value("UP"));
+	}
+
+	@Test
 	void returnsValidatedStructuredResponse() throws Exception {
 		mockMvc.perform(post("/api/v1/model/generate")
 					.contentType(MediaType.APPLICATION_JSON)

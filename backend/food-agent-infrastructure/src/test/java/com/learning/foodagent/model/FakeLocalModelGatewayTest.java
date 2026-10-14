@@ -10,7 +10,12 @@ import org.junit.jupiter.api.Test;
 class FakeLocalModelGatewayTest {
 
 	private final FakeLocalModelGateway gateway = new FakeLocalModelGateway(new ModelProperties(
-			"fake", URI.create("http://localhost:11434"), "test-model", Duration.ofSeconds(1)));
+			ModelProperties.Provider.FAKE,
+			URI.create("http://localhost:11434"),
+			"test-model",
+			Duration.ofSeconds(1),
+			0.1,
+			8192));
 
 	@Test
 	void isDeterministicAndHealthy() {

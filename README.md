@@ -12,7 +12,9 @@ M1 establishes the local-model boundary:
 - Spring AI isolated behind `LocalModelGateway`;
 - Ollama with configurable `qwen3:8b` defaults;
 - structured-output decoding and validation;
-- model health, timeout, cancellation, and deterministic fake support.
+- model health through the API and Spring Boot Actuator;
+- timeout, cancellation, and deterministic fake support;
+- a versioned system prompt in `food-agent-infrastructure/src/main/resources/prompts/`.
 
 The backend is a Maven modular monolith:
 
@@ -93,9 +95,25 @@ Configuration can be changed with environment variables:
 ```bash
 curl http://localhost:8080/api/v1/model/health
 
+curl http://localhost:8080/actuator/health
+
 curl -X POST http://localhost:8080/api/v1/model/generate \
   -H 'Content-Type: application/json' \
   -d '{"prompt":"Find me a vegetarian dosa"}'
 ```
 
 The generation endpoint is an M1 integration proof, not the final conversation or agent API.
+
+## Local model baseline
+
+The M1 live smoke test was run on an Apple M3 Pro with 18 GB unified memory using Ollama `0.40.3` and `qwen3:8b` (`Q4_K_M`) with an 8192-token context window. Ollama reported 100% GPU execution.
+
+| Scenario | Result |
+|---|---|
+| Model unloaded, first structured request | 7.37 seconds |
+| Model resident, repeated structured request | 3.78 seconds |
+| Configured model health | HTTP 200, `READY` |
+| Missing model health | HTTP 503, `MODEL_NOT_INSTALLED` |
+| Unreachable Ollama health | HTTP 503, `OLLAMA_UNREACHABLE` |
+
+These are single local smoke-test measurements rather than a performance benchmark. Structured output validation succeeded for the tested food and unsupported requests. Classification of an ambiguous request containing “near me” varied between `FOOD_REQUEST` and `CLARIFICATION`, so intent quality still needs the evaluation suite planned for M3.

@@ -3,12 +3,12 @@ spring:
     name: multi-provider-food-agent
   ai:
     ollama:
-      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      base-url: ${food-agent.model.base-url}
       chat:
         options:
-          model: ${OLLAMA_MODEL:qwen3:8b}
-          temperature: ${OLLAMA_TEMPERATURE:0.1}
-          num-ctx: ${OLLAMA_CONTEXT_WINDOW:8192}
+          model: ${food-agent.model.model}
+          temperature: ${food-agent.model.temperature}
+          num-ctx: ${food-agent.model.context-window}
 
 food-agent:
   model:
@@ -16,6 +16,8 @@ food-agent:
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
     model: ${OLLAMA_MODEL:qwen3:8b}
     timeout: ${MODEL_TIMEOUT:60s}
+    temperature: ${OLLAMA_TEMPERATURE:0.1}
+    context-window: ${OLLAMA_CONTEXT_WINDOW:8192}
 
 management:
   endpoints:
