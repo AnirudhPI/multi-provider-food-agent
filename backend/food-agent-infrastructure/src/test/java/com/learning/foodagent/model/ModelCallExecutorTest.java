@@ -35,6 +35,12 @@ class ModelCallExecutorTest {
 	}
 
 	private ModelProperties properties(Duration timeout) {
-		return new ModelProperties("ollama", URI.create("http://localhost:11434"), "qwen3:8b", timeout);
+		return new ModelProperties(
+				ModelProperties.Provider.OLLAMA,
+				URI.create("http://localhost:11434"),
+				"qwen3:8b",
+				timeout,
+				0.1,
+				8192);
 	}
 }

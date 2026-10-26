@@ -26,14 +26,14 @@ class ModelConfiguration {
 	}
 
 	@Bean
-	RestClient ollamaRestClient(ModelProperties properties) {
+	RestClient ollamaRestClient(RestClient.Builder builder, ModelProperties properties) {
 		var httpClient = HttpClient.newBuilder()
 				.connectTimeout(properties.timeout())
 				.build();
 		var requestFactory = new JdkClientHttpRequestFactory(httpClient);
 		requestFactory.setReadTimeout(properties.timeout());
 
-		return RestClient.builder()
+		return builder
 				.baseUrl(properties.baseUrl().toString())
 				.requestFactory(requestFactory)
 				.build();

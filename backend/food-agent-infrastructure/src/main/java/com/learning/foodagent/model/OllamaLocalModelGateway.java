@@ -11,18 +11,10 @@ import org.springframework.web.client.RestClient;
 @ConditionalOnProperty(name = "food-agent.model.provider", havingValue = "ollama", matchIfMissing = true)
 final class OllamaLocalModelGateway implements LocalModelGateway {
 
-	private static final String SYSTEM_PROMPT = """
-			You classify a user's message for a food-ordering assistant.
-			Use FOOD_REQUEST for requests about food, restaurants, menus, delivery, or ordering.
-			Use CLARIFICATION when the user is discussing food but essential meaning is missing.
-			Use UNSUPPORTED for unrelated requests.
-			Do not claim that a restaurant, menu item, price, or provider result exists.
-			Return only data matching the supplied schema.
-			""";
-
 	private final ChatClient chatClient;
 	private final RestClient ollamaRestClient;
 	private final ModelProperties properties;
+	private final ModelSystemPrompt systemPrompt;
 	private final StructuredResponseDecoder responseDecoder;
 	private final ModelCallExecutor callExecutor;
 
@@ -30,11 +22,13 @@ final class OllamaLocalModelGateway implements LocalModelGateway {
 			ChatClient modelChatClient,
 			RestClient ollamaRestClient,
 			ModelProperties properties,
+			ModelSystemPrompt systemPrompt,
 			StructuredResponseDecoder responseDecoder,
 			ModelCallExecutor callExecutor) {
 		this.chatClient = modelChatClient;
 		this.ollamaRestClient = ollamaRestClient;
 		this.properties = properties;
+		this.systemPrompt = systemPrompt;
 		this.responseDecoder = responseDecoder;
 		this.callExecutor = callExecutor;
 	}
@@ -70,7 +64,7 @@ final class OllamaLocalModelGateway implements LocalModelGateway {
 	private ModelResult invokeModel(ModelPrompt prompt) {
 		try {
 			String content = chatClient.prompt()
-					.system(SYSTEM_PROMPT + System.lineSeparator() + responseDecoder.format())
+					.system(systemPrompt.text() + System.lineSeparator() + responseDecoder.format())
 					.user(prompt.prompt())
 					.call()
 					.content();
