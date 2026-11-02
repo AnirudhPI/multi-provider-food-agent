@@ -202,12 +202,14 @@ Any cart mutation or expired/changed quote invalidates the prior confirmation. A
 
 Record lightweight decisions before introducing or changing implementation technologies. The M1 baseline is documented in `docs/decisions/0001-m1-technology-baseline.md`: Java 21, Spring Boot, Maven, Spring AI behind a project-owned gateway, and Ollama with configurable `qwen3:8b`. Remaining decision areas are:
 
-1. MCP client library/transport and provider auth flows;
+1. Zomato's MCP client/auth details and production-grade multi-user provider sessions; the M2 Swiggy decision is recorded in ADR 0002;
 2. frontend component/test stack around React and TypeScript;
 3. session persistence;
 4. packaging and deployment approach.
 
 Choose the smallest stack that supports streaming, schema validation, MCP connectivity, testability, and clear local setup.
+
+For M2, the Swiggy adapter uses Spring AI's synchronous JDK `HttpClient` MCP client over Streamable HTTP. A project-owned `SwiggyMcpToolClient` keeps SDK types inside infrastructure, while the application port and canonical restaurant models remain provider/MCP independent. The auto-configured MCP session is acceptable only for this single-user local milestone; it is not a multi-user security boundary.
 
 ## 10. Dependency rule
 

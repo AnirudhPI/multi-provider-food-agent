@@ -20,7 +20,7 @@
 
 **Exit criteria:** documents are approved; no product implementation has been added; technology decisions required for M1 are recorded.
 
-## M1 — Local model foundation (current)
+## M1 — Local model foundation (complete)
 
 **Outcome:** the backend can send a constrained request to a selected local model and validate structured output.
 
@@ -31,7 +31,7 @@
 
 **Exit criteria:** one command runs tests; one documented command starts the backend; a test/demo proves valid structured output and safe handling of malformed output or unavailable model.
 
-## M2 — Swiggy MCP vertical slice
+## M2 — Swiggy MCP vertical slice (complete)
 
 **Outcome:** a user request can produce grounded Swiggy restaurant or dish search results through the backend.
 

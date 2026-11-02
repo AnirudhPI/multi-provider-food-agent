@@ -11,4 +11,11 @@
 	</parent>
 	<artifactId>food-agent-domain</artifactId>
 	<name>food-agent-domain</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

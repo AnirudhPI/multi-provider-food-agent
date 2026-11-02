@@ -2,9 +2,9 @@
 
 ## Current phase
 
-This repository is in **M1: local model foundation**.
+**M2: Swiggy MCP vertical slice is complete and pending review/merge.** Do not begin M3 until the M2 pull request is reviewed and merged and the user explicitly asks to proceed.
 
-- Limit implementation to the active milestone. Do not add provider integrations, frontend scaffolding, containers, CI workflows, persistence, or deployment configuration during M1.
+- Limit implementation to the active milestone. Add only the Swiggy read-only discovery path needed by M2; do not add the agent loop, frontend scaffolding, Zomato, ordering, containers, CI workflows, persistence, or deployment configuration.
 - The four documents in `docs/project/`—`SPEC.md`, `ARCHITECTURE.md`, `PLAN.md`, and this file—are the current source of truth.
 - The planning baseline is committed on `development`. For subsequent work, create a short-lived feature branch from `development` and open a pull request back to `development` for user review.
 - Do not push feature commits directly to `development` or `main`, and do not merge pull requests, unless the user explicitly instructs you to do so.
@@ -78,7 +78,7 @@ Each implemented behavior must have proportionate automated coverage:
 
 Tests must cover relevant failure paths, especially invalid model output, auth failure, timeout, partial provider failure, stale quotes, confirmation invalidation, and ambiguous consequential-call results.
 
-Exact commands will be added after the M1 technology decision. Do not invent commands in documentation before the tooling exists.
+The backend validation command is `cd backend && ./mvnw test`. Live provider tests must remain explicitly enabled and must use credentials and coordinates supplied outside source control.
 
 ## Change discipline
 
