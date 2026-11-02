@@ -146,7 +146,7 @@ The application has its own web UI and backend. It must not depend on the ChatGP
 
 - Backend language and framework are resolved for M1: Java 21, Spring Boot, and Maven.
 - Local LLM baseline is resolved for M1: Ollama with configurable `qwen3:8b`, initially targeting an Apple M3 Pro with 18 GB unified memory.
-- Exact Swiggy and Zomato MCP tools available to the project and their authentication flows.
+- Zomato MCP tools and authentication remain an M5 decision. Swiggy's M2 discovery capability and OAuth decision are recorded in `docs/decisions/0002-swiggy-mcp-discovery-and-auth.md`.
 - Whether the first release executes real order placement or stops at a provider-hosted checkout handoff.
 - Session storage approach and whether any durable history is in scope.
 - Initial ranking weights and how the UI lets users override them.

@@ -6,15 +6,13 @@ The project is developed incrementally. See [`docs/project/`](docs/project/) for
 
 ## Current milestone
 
-M1 establishes the local-model boundary:
+M2 adds the first read-only Swiggy MCP vertical slice while retaining the M1 local-model foundation:
 
-- Java 21 and Spring Boot with Maven;
-- Spring AI isolated behind `LocalModelGateway`;
-- Ollama with configurable `qwen3:8b` defaults;
-- structured-output decoding and validation;
-- model health through the API and Spring Boot Actuator;
-- timeout, cancellation, and deterministic fake support;
-- a versioned system prompt in `food-agent-infrastructure/src/main/resources/prompts/`.
+- provider-neutral restaurant search models and application service;
+- a Swiggy `search_restaurants` adapter over MCP Streamable HTTP;
+- sanitized contract fixtures and normalized restaurant results;
+- explicit unavailable, unauthenticated, timeout, and invalid-response errors;
+- an opt-in, read-only live smoke test.
 
 The backend is a Maven modular monolith:
 
@@ -23,13 +21,13 @@ backend/
 ├── food-agent-domain/          # Framework-independent domain rules
 ├── food-agent-application/     # Use cases and outbound ports
 ├── food-agent-api/             # REST controllers and HTTP DTOs
-├── food-agent-infrastructure/  # Spring AI and Ollama adapters
+├── food-agent-infrastructure/  # Ollama and provider/MCP adapters
 └── food-agent-boot/            # Executable application and wiring
 ```
 
 Dependencies point inward: `boot` assembles `api` and `infrastructure`; both depend on `application`, which depends on `domain`.
 
-No provider integration or frontend has been implemented yet.
+The frontend, agent loop, Zomato adapter, menu/cart, and ordering flows have not been implemented yet.
 
 ## Prerequisites on macOS
 
@@ -89,6 +87,10 @@ Configuration can be changed with environment variables:
 | `OLLAMA_CONTEXT_WINDOW` | `8192` | Context window |
 | `MODEL_TIMEOUT` | `60s` | Maximum application wait for a model call |
 | `MODEL_PROVIDER` | `ollama` | Use `fake` for a deterministic local demo |
+| `SWIGGY_MCP_ENABLED` | `false` | Enables the Swiggy Food MCP connection |
+| `SWIGGY_MCP_ACCESS_TOKEN` | empty | Temporary OAuth access token; never commit or log it |
+| `SWIGGY_MCP_BASE_URL` | `https://mcp.swiggy.com` | Swiggy MCP origin |
+| `SWIGGY_MCP_TIMEOUT` | `20s` | Maximum MCP request duration |
 
 ### Model API
 
@@ -103,6 +105,38 @@ curl -X POST http://localhost:8080/api/v1/model/generate \
 ```
 
 The generation endpoint is an M1 integration proof, not the final conversation or agent API.
+
+### Swiggy restaurant API
+
+With Swiggy disabled, the endpoint returns `PROVIDER_UNAVAILABLE`. When enabled, every call requires a Swiggy OAuth token:
+
+```bash
+curl 'http://localhost:8080/api/v1/providers/swiggy/restaurants?query=dosa&latitude=12.9716&longitude=77.5946'
+```
+
+Swiggy uses OAuth 2.1 with PKCE rather than a static API key. Complete the official [Authenticate flow](https://mcp.swiggy.com/builders/docs/start/authenticate/) yourself, then provide the temporary access token only in the process environment. To avoid putting the secret in shell history:
+
+```bash
+read -s SWIGGY_MCP_ACCESS_TOKEN
+export SWIGGY_MCP_ACCESS_TOKEN
+export SWIGGY_MCP_ENABLED=true
+```
+
+The M2 adapter can call only `search_restaurants`; it cannot invoke cart or order tools. Token persistence, refresh, and browser login are deliberately deferred until the UI/session design can provide a correct per-user lifecycle.
+
+### Opt-in Swiggy live smoke test
+
+The ordinary test suite never calls Swiggy. After authenticating, provide test coordinates outside source control and opt in explicitly:
+
+```bash
+export SWIGGY_MCP_LIVE_TEST=true
+export SWIGGY_MCP_TEST_LATITUDE='<latitude>'
+export SWIGGY_MCP_TEST_LONGITUDE='<longitude>'
+cd backend
+./mvnw -Dtest=SwiggyLiveSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
+The smoke test performs restaurant discovery only. It does not modify a cart or place an order.
 
 ## Local model baseline
 

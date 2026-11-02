@@ -2,6 +2,23 @@ spring:
   application:
     name: multi-provider-food-agent
   ai:
+    mcp:
+      client:
+        enabled: ${SWIGGY_MCP_ENABLED:false}
+        name: multi-provider-food-agent
+        version: 0.0.1
+        type: SYNC
+        initialized: false
+        request-timeout: ${SWIGGY_MCP_TIMEOUT:20s}
+        toolcallback:
+          enabled: false
+        annotation-scanner:
+          enabled: false
+        streamable-http:
+          connections:
+            swiggy-food:
+              url: ${food-agent.providers.swiggy.base-url}
+              endpoint: /food
     ollama:
       base-url: ${food-agent.model.base-url}
       chat:
@@ -11,6 +28,11 @@ spring:
           num-ctx: ${food-agent.model.context-window}
 
 food-agent:
+  providers:
+    swiggy:
+      enabled: ${SWIGGY_MCP_ENABLED:false}
+      base-url: ${SWIGGY_MCP_BASE_URL:https://mcp.swiggy.com}
+      access-token: ${SWIGGY_MCP_ACCESS_TOKEN:}
   model:
     provider: ${MODEL_PROVIDER:ollama}
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}

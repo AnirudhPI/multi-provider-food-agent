@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "data": {
+    "restaurants": [
+      {
+        "id": "restaurant-101",
+        "name": "South Kitchen",
+        "cuisines": ["South Indian", "Beverages"],
+        "avgRating": 4.4,
+        "totalRatings": "1.2K+",
+        "costForTwo": "₹300 for two",
+        "areaName": "Learning Layout",
+        "distanceKm": 2.3,
+        "deliveryTimeMinutes": 28,
+        "veg": true,
+        "offer": "20% off",
+        "imageUrl": "https://images.example.test/restaurant-101.png",
+        "availabilityStatus": "OPEN"
+      }
+    ],
+    "dishes": [],
+    "nextOffset": 10,
+    "query": "dosa",
+    "totalRestaurants": 11,
+    "hasMore": true
+  },
+  "message": "Restaurant results"
+}
