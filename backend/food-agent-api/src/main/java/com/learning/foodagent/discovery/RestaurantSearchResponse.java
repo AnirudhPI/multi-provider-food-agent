@@ -7,7 +7,7 @@ import java.util.List;
 import com.learning.foodagent.domain.discovery.RestaurantSearchResult;
 import com.learning.foodagent.domain.discovery.RestaurantSummary;
 
-record RestaurantSearchResponse(
+public record RestaurantSearchResponse(
 		String provider,
 		String query,
 		List<RestaurantResponse> restaurants,
@@ -15,7 +15,7 @@ record RestaurantSearchResponse(
 		boolean hasMore,
 		Instant observedAt) {
 
-	static RestaurantSearchResponse from(RestaurantSearchResult result) {
+	public static RestaurantSearchResponse from(RestaurantSearchResult result) {
 		return new RestaurantSearchResponse(
 				result.provider().name(),
 				result.query(),
@@ -25,7 +25,7 @@ record RestaurantSearchResponse(
 				result.observedAt());
 	}
 
-	record RestaurantResponse(
+	public record RestaurantResponse(
 			String providerRestaurantId,
 			String name,
 			List<String> cuisines,

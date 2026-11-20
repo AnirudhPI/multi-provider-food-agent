@@ -6,13 +6,13 @@ The project is developed incrementally. See [`docs/project/`](docs/project/) for
 
 ## Current milestone
 
-M2 adds the first read-only Swiggy MCP vertical slice while retaining the M1 local-model foundation:
+M3 adds a bounded agent/tool-calling loop over the M1 local model and M2 Swiggy discovery slice:
 
-- provider-neutral restaurant search models and application service;
-- a Swiggy `search_restaurants` adapter over MCP Streamable HTTP;
-- sanitized contract fixtures and normalized restaurant results;
-- explicit unavailable, unauthenticated, timeout, and invalid-response errors;
-- an opt-in, read-only live smoke test.
+- typed model actions for tool calls, final answers, clarification, and unsupported requests;
+- an allow-listed `search_restaurants` application tool over `RestaurantDiscoveryService`;
+- validated arguments, bounded steps/results/observations, cancellation, and an overall turn timeout;
+- safe trace events with a correlation ID for the future UI;
+- deterministic orchestration tests and an opt-in evaluation against the real local Ollama model.
 
 The backend is a Maven modular monolith:
 
@@ -27,7 +27,7 @@ backend/
 
 Dependencies point inward: `boot` assembles `api` and `infrastructure`; both depend on `application`, which depends on `domain`.
 
-The frontend, agent loop, Zomato adapter, menu/cart, and ordering flows have not been implemented yet.
+The frontend, Zomato adapter, conversation persistence, menu/cart, and ordering flows have not been implemented yet.
 
 ## Prerequisites on macOS
 
@@ -87,6 +87,10 @@ Configuration can be changed with environment variables:
 | `OLLAMA_CONTEXT_WINDOW` | `8192` | Context window |
 | `MODEL_TIMEOUT` | `60s` | Maximum application wait for a model call |
 | `MODEL_PROVIDER` | `ollama` | Use `fake` for a deterministic local demo |
+| `AGENT_MAXIMUM_STEPS` | `3` | Maximum model decisions in one agent turn |
+| `AGENT_MAXIMUM_OBSERVATION_CHARACTERS` | `6000` | Maximum tool observation sent back to the model |
+| `AGENT_MAXIMUM_RESULTS_PER_TOOL` | `5` | Maximum normalized restaurants retained per tool call |
+| `AGENT_TIMEOUT` | `90s` | Overall model-and-tool deadline for one agent turn |
 | `SWIGGY_MCP_ENABLED` | `false` | Enables the Swiggy Food MCP connection |
 | `SWIGGY_MCP_ACCESS_TOKEN` | empty | Temporary OAuth access token; never commit or log it |
 | `SWIGGY_MCP_BASE_URL` | `https://mcp.swiggy.com` | Swiggy MCP origin |
@@ -105,6 +109,23 @@ curl -X POST http://localhost:8080/api/v1/model/generate \
 ```
 
 The generation endpoint is an M1 integration proof, not the final conversation or agent API.
+
+### Agent API
+
+The M3 endpoint accepts a natural-language message plus an optional resolved location:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/agent/turns \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message":"Find highly rated vegetarian dosa restaurants",
+    "location":{"latitude":12.9716,"longitude":77.5946}
+  }'
+```
+
+If location is absent, the agent can return `CLARIFICATION_REQUIRED`. Coordinates are application context and are never exposed as model-generated tool arguments. The response includes normalized restaurant results and safe trace events; it never exposes hidden model reasoning.
+
+For a deterministic API demonstration that does not call Ollama, start the application with `MODEL_PROVIDER=fake`.
 
 ### Swiggy restaurant API
 
@@ -137,6 +158,20 @@ cd backend
 ```
 
 The smoke test performs restaurant discovery only. It does not modify a cart or place an order.
+
+### Opt-in Ollama agent evaluation
+
+The ordinary suite uses scripted model behavior. To verify tool selection and missing-location clarification against the configured local model, start Ollama and run:
+
+```bash
+export OLLAMA_AGENT_LIVE_TEST=true
+cd backend
+./mvnw -Dtest=OllamaAgentLiveEvaluationTest -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
+This evaluation uses a deterministic fake restaurant provider. It does not need a Swiggy token and makes no provider or ordering calls.
+
+On 2026-11-20, the complete M3 read-only flow was also verified manually with temporary in-memory OAuth credentials: a natural-language request caused `qwen3:8b` to select the allow-listed tool, live Swiggy returned five normalized restaurant results, and the model produced a final response. The trace completed as `TURN_STARTED → MODEL_REQUESTED → TOOL_STARTED → TOOL_COMPLETED → MODEL_REQUESTED → TURN_COMPLETED`. No token, authorization code, coordinates, or raw provider payload was retained.
 
 ## Local model baseline
 

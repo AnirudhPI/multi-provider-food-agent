@@ -43,7 +43,7 @@
 
 **Exit criteria:** mocked contract tests pass; an opt-in live smoke test returns normalized Swiggy results; no secrets appear in source, prompts, test fixtures, or logs.
 
-## M3 — Agent/tool-calling loop
+## M3 — Agent/tool-calling loop (complete, pending review/merge)
 
 **Outcome:** the local model can interpret natural language and invoke allow-listed read-only application tools safely.
 
@@ -53,6 +53,8 @@
 - Add evaluations for search intent, clarifying questions, invalid tool arguments, and tool failure.
 
 **Exit criteria:** representative natural-language requests consistently select valid tools and return grounded responses; arbitrary tools/arguments are rejected.
+
+**Validation:** deterministic orchestration and API tests pass; an opt-in real-Ollama evaluation covers tool selection and missing-location clarification; and a 2026-11-20 manual read-only test verified the complete Ollama → application tool → live Swiggy → grounded response path with ephemeral credentials.
 
 ## M4 — React user interface
 

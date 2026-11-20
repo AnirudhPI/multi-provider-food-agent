@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +16,7 @@ final class ModelCallExecutor {
 	private final ExecutorService executor;
 	private final ModelProperties properties;
 
-	ModelCallExecutor(ExecutorService modelExecutor, ModelProperties properties) {
+	ModelCallExecutor(@Qualifier("modelExecutor") ExecutorService modelExecutor, ModelProperties properties) {
 		this.executor = modelExecutor;
 		this.properties = properties;
 	}

@@ -72,6 +72,10 @@ Backend API (modular monolith)
 - Delegates facts, arithmetic, filtering, normalization, and policy enforcement to deterministic services.
 - Records an auditable action trace without storing hidden reasoning or secrets.
 
+The M3 implementation uses a project-owned structured action protocol rather than giving Spring AI automatic access to provider tools. The model may return `ToolCall`, `FinalAnswer`, `Clarification`, or `Unsupported`; the application validates that action, looks up an exact allow-listed read-only tool, and owns execution. A final answer is rejected unless at least one tool observation exists, while clarification and unsupported outcomes require no provider call.
+
+Each turn has an overall deadline and maximum step count. Model calls and tool calls execute on cancellable virtual-thread tasks within the remaining deadline. Tool observations, normalized result counts, and final structured results are bounded independently. Trace events contain a turn identifier, event type, step, tool name when applicable, and timestamp, but never hidden reasoning.
+
 ### 3.4 Local model gateway
 
 - Provides one internal interface independent of the chosen runtime/model.
@@ -123,6 +127,8 @@ Initial state is session-scoped and contains only what is needed for a coherent 
 - correlation metadata.
 
 Start with the simplest storage that satisfies the chosen deployment mode. Introduce durable persistence only after its retention, privacy, and multi-user requirements are approved.
+
+M3 accepts an optional resolved coordinate pair as request context. The model sees only whether a location is available; coordinates never become model-generated tool arguments. This is deliberately source-neutral so M4 browser geolocation, a supported provider saved-location capability, or M8 application-managed saved locations can later resolve the same internal `GeoCoordinates` value without changing the agent tool.
 
 ## 4. Canonical data model principles
 

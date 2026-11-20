@@ -28,6 +28,11 @@ spring:
           num-ctx: ${food-agent.model.context-window}
 
 food-agent:
+  agent:
+    maximum-steps: ${AGENT_MAXIMUM_STEPS:3}
+    maximum-observation-characters: ${AGENT_MAXIMUM_OBSERVATION_CHARACTERS:6000}
+    maximum-results-per-tool: ${AGENT_MAXIMUM_RESULTS_PER_TOOL:5}
+    timeout: ${AGENT_TIMEOUT:90s}
   providers:
     swiggy:
       enabled: ${SWIGGY_MCP_ENABLED:false}
