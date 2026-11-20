@@ -56,7 +56,7 @@
 
 **Validation:** deterministic orchestration and API tests pass; an opt-in real-Ollama evaluation covers tool selection and missing-location clarification; and a 2026-11-20 manual read-only test verified the complete Ollama → application tool → live Swiggy → grounded response path with ephemeral credentials.
 
-## M4 — React user interface
+## M4 — React user interface (complete, pending review/merge)
 
 **Outcome:** a user can complete the Swiggy discovery flow in the standalone web UI.
 
@@ -66,6 +66,8 @@
 - Add component and end-to-end coverage for the vertical slice.
 
 **Exit criteria:** the search/refinement flow works from UI to Swiggy MCP; loading, empty, timeout, and auth-error states are usable.
+
+**Validation:** the production TypeScript build, component tests, Spring streaming integration test, and mocked Playwright discovery journey pass. On 2026-11-20, a manual read-only browser smoke test also verified the complete React UI → streaming Spring API → Ollama → application tool → live Swiggy → structured restaurant-card path with temporary in-memory OAuth credentials and user-approved browser geolocation. The UI rendered five provider-grounded results and retained no token, authorization code, or coordinates.
 
 ## M5 — Zomato MCP integration
 
