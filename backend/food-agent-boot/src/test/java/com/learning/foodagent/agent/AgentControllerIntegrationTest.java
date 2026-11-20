@@ -1,7 +1,11 @@
 package com.learning.foodagent.agent;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
@@ -17,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import com.learning.foodagent.discovery.RestaurantDiscoveryGateway;
 import com.learning.foodagent.domain.discovery.FoodProvider;
@@ -49,6 +54,28 @@ class AgentControllerIntegrationTest {
 				.andExpect(jsonPath("$.restaurantSearches[0].restaurants[0].name").value("Learning Dosa House"))
 				.andExpect(jsonPath("$.trace[0].type").value("TURN_STARTED"))
 				.andExpect(jsonPath("$.trace[?(@.type == 'TOOL_COMPLETED')]").exists());
+	}
+
+	@Test
+	void streamsProgressBeforeReturningTheFinalResult() throws Exception {
+		MvcResult pending = mockMvc.perform(post("/api/v1/agent/turns/stream")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+							{
+							  "message": "Find vegetarian dosa",
+							  "location": {"latitude": 12.9716, "longitude": 77.5946}
+							}
+							"""))
+				.andExpect(request().asyncStarted())
+				.andReturn();
+
+		mockMvc.perform(asyncDispatch(pending))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))
+				.andExpect(content().string(containsString("event:trace")))
+				.andExpect(content().string(containsString("\"type\":\"TOOL_COMPLETED\"")))
+				.andExpect(content().string(containsString("event:result")))
+				.andExpect(content().string(containsString("Learning Dosa House")));
 	}
 
 	@Test

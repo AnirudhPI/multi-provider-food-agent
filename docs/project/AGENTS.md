@@ -2,9 +2,9 @@
 
 ## Current phase
 
-**M3: Agent/tool-calling loop is complete and pending review/merge.** Do not begin M4 until the M3 pull request is reviewed and merged and the user explicitly asks to proceed.
+**M4: React user interface is complete and pending review/merge.** Do not begin M5 until the M4 pull request is reviewed and merged and the user explicitly asks to proceed.
 
-- Limit implementation to the active milestone. M3 adds only the bounded read-only agent loop over the existing Swiggy discovery service; do not add frontend scaffolding, Zomato, ordering, containers, CI workflows, persistence, or deployment configuration.
+- Limit implementation to the active milestone. M4 adds only the standalone React/TypeScript interface and streaming progress needed for the existing read-only Swiggy discovery flow; do not add Zomato, ordering, containers, CI workflows, persistence, or deployment configuration.
 - The four documents in `docs/project/`—`SPEC.md`, `ARCHITECTURE.md`, `PLAN.md`, and this file—are the current source of truth.
 - The planning baseline is committed on `development`. For subsequent work, create a short-lived feature branch from `development` and open a pull request back to `development` for user review.
 - Do not push feature commits directly to `development` or `main`, and do not merge pull requests, unless the user explicitly instructs you to do so.

@@ -6,13 +6,13 @@ The project is developed incrementally. See [`docs/project/`](docs/project/) for
 
 ## Current milestone
 
-M3 adds a bounded agent/tool-calling loop over the M1 local model and M2 Swiggy discovery slice:
+M4 adds the standalone browser interface over the M3 agent loop and M2 Swiggy discovery slice:
 
-- typed model actions for tool calls, final answers, clarification, and unsupported requests;
-- an allow-listed `search_restaurants` application tool over `RestaurantDiscoveryService`;
-- validated arguments, bounded steps/results/observations, cancellation, and an overall turn timeout;
-- safe trace events with a correlation ID for the future UI;
-- deterministic orchestration tests and an opt-in evaluation against the real local Ollama model.
+- a Vite, React, and TypeScript single-page application;
+- user-approved browser geolocation kept in page memory;
+- streamed model/tool progress over server-sent events;
+- structured Swiggy restaurant cards and clear clarification/error states;
+- Vitest/React Testing Library component coverage and a Playwright browser journey.
 
 The backend is a Maven modular monolith:
 
@@ -27,7 +27,9 @@ backend/
 
 Dependencies point inward: `boot` assembles `api` and `infrastructure`; both depend on `application`, which depends on `domain`.
 
-The frontend, Zomato adapter, conversation persistence, menu/cart, and ordering flows have not been implemented yet.
+The standalone frontend lives in `frontend/` and depends only on the browser-facing HTTP/SSE contract. It does not import backend, MCP, or provider types.
+
+The Zomato adapter, conversation persistence, menu/cart, and ordering flows have not been implemented yet.
 
 ## Prerequisites on macOS
 
@@ -67,6 +69,23 @@ cd backend
 
 Tests use a deterministic fake gateway and do not require Ollama.
 
+Test and build the frontend:
+
+```bash
+cd frontend
+npm install
+npm test
+npm run build
+```
+
+The optional browser test requires Playwright's Chromium once per machine:
+
+```bash
+cd frontend
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## Run
 
 ```bash
@@ -76,6 +95,16 @@ java -jar food-agent-boot/target/food-agent-boot-0.0.1-SNAPSHOT.jar
 ```
 
 The executable application and runtime configuration belong to `food-agent-boot`; the other modules produce ordinary library JARs.
+
+In a second terminal, run the frontend development server:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. Vite proxies `/api` to the Spring Boot backend at `http://localhost:8080`, so local development does not require a CORS configuration. The UI requests browser location only when you select **Use my location** and does not persist coordinates or provider credentials.
 
 Configuration can be changed with environment variables:
 
@@ -125,6 +154,8 @@ curl -X POST http://localhost:8080/api/v1/agent/turns \
 
 If location is absent, the agent can return `CLARIFICATION_REQUIRED`. Coordinates are application context and are never exposed as model-generated tool arguments. The response includes normalized restaurant results and safe trace events; it never exposes hidden model reasoning.
 
+The browser uses `POST /api/v1/agent/turns/stream`, which accepts the same request and emits server-sent events named `trace`, `result`, and `error`. The synchronous endpoint above remains available for scripts and debugging.
+
 For a deterministic API demonstration that does not call Ollama, start the application with `MODEL_PROVIDER=fake`.
 
 ### Swiggy restaurant API
@@ -172,6 +203,8 @@ cd backend
 This evaluation uses a deterministic fake restaurant provider. It does not need a Swiggy token and makes no provider or ordering calls.
 
 On 2026-11-20, the complete M3 read-only flow was also verified manually with temporary in-memory OAuth credentials: a natural-language request caused `qwen3:8b` to select the allow-listed tool, live Swiggy returned five normalized restaurant results, and the model produced a final response. The trace completed as `TURN_STARTED → MODEL_REQUESTED → TOOL_STARTED → TOOL_COMPLETED → MODEL_REQUESTED → TURN_COMPLETED`. No token, authorization code, coordinates, or raw provider payload was retained.
+
+On 2026-11-20, the M4 browser flow was verified separately through the React interface. After user-approved browser geolocation, the streamed request traversed Spring Boot, Ollama, the allow-listed discovery tool, and Swiggy's live MCP server. The UI rendered five provider-grounded restaurant cards with ratings, delivery estimates, areas, costs, and provider attribution. The temporary OAuth token and coordinates remained in process memory and were not retained.
 
 ## Local model baseline
 
