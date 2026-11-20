@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.learning.foodagent.model.InvalidModelResponseException;
 import com.learning.foodagent.model.ModelTimeoutException;
 import com.learning.foodagent.model.ModelUnavailableException;
+import com.learning.foodagent.agent.AgentStepLimitException;
+import com.learning.foodagent.agent.AgentTimeoutException;
+import com.learning.foodagent.agent.InvalidAgentActionException;
 import com.learning.foodagent.discovery.ProviderAuthenticationException;
 import com.learning.foodagent.discovery.ProviderResponseException;
 import com.learning.foodagent.discovery.ProviderTimeoutException;
@@ -39,6 +42,21 @@ final class GlobalExceptionHandler {
 	@ExceptionHandler(ModelUnavailableException.class)
 	ResponseEntity<ApiError> modelUnavailable(ModelUnavailableException exception) {
 		return error(HttpStatus.SERVICE_UNAVAILABLE, "MODEL_UNAVAILABLE", exception.getMessage());
+	}
+
+	@ExceptionHandler(InvalidAgentActionException.class)
+	ResponseEntity<ApiError> invalidAgentAction(InvalidAgentActionException exception) {
+		return error(HttpStatus.BAD_GATEWAY, "INVALID_AGENT_ACTION", exception.getMessage());
+	}
+
+	@ExceptionHandler(AgentStepLimitException.class)
+	ResponseEntity<ApiError> agentStepLimit(AgentStepLimitException exception) {
+		return error(HttpStatus.BAD_GATEWAY, "AGENT_STEP_LIMIT", exception.getMessage());
+	}
+
+	@ExceptionHandler(AgentTimeoutException.class)
+	ResponseEntity<ApiError> agentTimeout(AgentTimeoutException exception) {
+		return error(HttpStatus.GATEWAY_TIMEOUT, "AGENT_TIMEOUT", exception.getMessage());
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
