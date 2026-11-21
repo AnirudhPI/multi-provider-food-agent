@@ -56,6 +56,8 @@ Backend API (modular monolith)
 - Holds no provider credentials and does not call provider MCP servers directly.
 - Treats backend responses as data; business rules and confirmation enforcement remain server-side.
 
+The M4 implementation is a Vite-powered React and TypeScript SPA. During local development, Vite proxies same-origin `/api` requests to Spring Boot. The UI uses `POST /api/v1/agent/turns/stream` to receive safe server-sent `trace`, `result`, and `error` events. The existing synchronous endpoint remains available. Browser geolocation is requested only after a user action; coordinates live only in page memory and are sent as backend turn context, while provider authentication remains entirely server-side.
+
 ### 3.2 Backend API
 
 - Defines the browser-facing API and session boundary.
@@ -209,7 +211,7 @@ Any cart mutation or expired/changed quote invalidates the prior confirmation. A
 Record lightweight decisions before introducing or changing implementation technologies. The M1 baseline is documented in `docs/decisions/0001-m1-technology-baseline.md`: Java 21, Spring Boot, Maven, Spring AI behind a project-owned gateway, and Ollama with configurable `qwen3:8b`. Remaining decision areas are:
 
 1. Zomato's MCP client/auth details and production-grade multi-user provider sessions; the M2 Swiggy decision is recorded in ADR 0002;
-2. frontend component/test stack around React and TypeScript;
+2. the frontend stack is resolved for M4 in ADR 0004: Vite, React, TypeScript, npm, Vitest/React Testing Library, and Playwright;
 3. session persistence;
 4. packaging and deployment approach.
 

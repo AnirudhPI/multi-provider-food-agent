@@ -44,6 +44,29 @@ class AgentOrchestratorTest {
 	}
 
 	@Test
+	void publishesTraceEventsWhileTurnRuns() {
+		var model = new ScriptedModelGateway(
+				new AgentModelAction.ToolCall("search_restaurants", Map.of("query", "dosa")),
+				new AgentModelAction.FinalAnswer("Done"));
+		ReadOnlyAgentTool tool = fixedTool(
+				"search_restaurants", new AgentToolResult("one result", List.of(searchResult())));
+		List<AgentTraceEvent> published = new ArrayList<>();
+
+		AgentTurnResult result = orchestrator(model, List.of(tool), LIMITS)
+				.handle(new AgentTurnCommand("Find dosa", LOCATION), published::add);
+
+		assertEquals(result.trace(), published);
+		assertEquals(List.of(
+				AgentTraceEvent.Type.TURN_STARTED,
+				AgentTraceEvent.Type.MODEL_REQUESTED,
+				AgentTraceEvent.Type.TOOL_STARTED,
+				AgentTraceEvent.Type.TOOL_COMPLETED,
+				AgentTraceEvent.Type.MODEL_REQUESTED,
+				AgentTraceEvent.Type.TURN_COMPLETED),
+				published.stream().map(AgentTraceEvent::type).toList());
+	}
+
+	@Test
 	void returnsClarificationWithoutExecutingTool() {
 		var model = new ScriptedModelGateway(
 				new AgentModelAction.Clarification("Which location should I search near?"));
